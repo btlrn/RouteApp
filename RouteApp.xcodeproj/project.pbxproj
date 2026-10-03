@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		775BB5F93070D9E8008BFB82 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */; };
+		775BB5FE3070E348008BFB82 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 775BB5FD3070E348008BFB82 /* GoogleMaps */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				775BB5FE3070E348008BFB82 /* GoogleMaps in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			);
 			name = RouteApp;
 			packageProductDependencies = (
+				775BB5FD3070E348008BFB82 /* GoogleMaps */,
 			);
 			productName = RouteApp;
 			productReference = 775BB5E83070D592008BFB82 /* RouteApp.app */;
@@ -113,6 +116,9 @@
 			);
 			mainGroup = 775BB5DF3070D592008BFB82;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				775BB5FC3070E348008BFB82 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 775BB5E93070D592008BFB82 /* Products */;
 			projectDirPath = "";
@@ -358,6 +364,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		775BB5FC3070E348008BFB82 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		775BB5FD3070E348008BFB82 /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 775BB5FC3070E348008BFB82 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 775BB5E03070D592008BFB82 /* Project object */;
 }
