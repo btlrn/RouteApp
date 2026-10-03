@@ -6,13 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		775BB5F93070D9E8008BFB82 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		775BB5E83070D592008BFB82 /* RouteApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		775BB5FB3070DB2C008BFB82 /* Exceptions for "RouteApp" folder in "RouteApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 775BB5E73070D592008BFB82 /* RouteApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		775BB5EA3070D592008BFB82 /* RouteApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				775BB5FB3070DB2C008BFB82 /* Exceptions for "RouteApp" folder in "RouteApp" target */,
+			);
 			path = RouteApp;
 			sourceTree = "<group>";
 		};
@@ -32,6 +50,7 @@
 		775BB5DF3070D592008BFB82 = {
 			isa = PBXGroup;
 			children = (
+				775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */,
 				775BB5EA3070D592008BFB82 /* RouteApp */,
 				775BB5E93070D592008BFB82 /* Products */,
 			);
@@ -109,6 +128,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				775BB5F93070D9E8008BFB82 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +147,7 @@
 /* Begin XCBuildConfiguration section */
 		775BB5F13070D593008BFB82 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -191,6 +212,7 @@
 		};
 		775BB5F23070D593008BFB82 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -248,6 +270,7 @@
 		};
 		775BB5F43070D593008BFB82 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -256,6 +279,7 @@
 				DEVELOPMENT_TEAM = WJ33K9YP9Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RouteApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -280,6 +304,7 @@
 		};
 		775BB5F53070D593008BFB82 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 775BB5F83070D9E8008BFB82 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -288,6 +313,7 @@
 				DEVELOPMENT_TEAM = WJ33K9YP9Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RouteApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
