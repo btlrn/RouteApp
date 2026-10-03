@@ -1,26 +1,34 @@
 import SwiftUI
-import CoreLocation
 
 struct ContentView: View {
 
-    // Pin'in gösterdiği son koordinat
-    @State private var center: CLLocationCoordinate2D?
+    @State private var viewModel = MapViewModel()
 
     var body: some View {
-        MapView { coordinate in
-            center = coordinate
+        MapView(
+            startPoint: viewModel.startPoint,
+            endPoint: viewModel.endPoint
+        ) { coordinate in
+            viewModel.center = coordinate
         }
         .overlay {
-            PinView()
+            if viewModel.state != .ready {
+                PinView()
+            }
         }
         .ignoresSafeArea()
         .overlay(alignment: .bottom) {
-            if let center {
-                Text(String(format: "%.5f, %.5f", center.latitude, center.longitude))
-                    .padding(8)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
-                    .padding(.bottom, 40)
+            Button {
+                viewModel.confirmSelection()
+            } label: {
+                Text(viewModel.buttonTitle)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 14)
+                    .background(.blue, in: Capsule())
             }
+            .padding(.bottom, 40)
         }
     }
 }

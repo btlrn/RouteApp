@@ -3,15 +3,14 @@ import GoogleMaps
 
 struct MapView: UIViewRepresentable {
 
-    // Harita durunca çağrılacak fonksiyon (ContentView verecek)
+    var startPoint: CLLocationCoordinate2D?
+    var endPoint: CLLocationCoordinate2D?
     var onCameraIdle: (CLLocationCoordinate2D) -> Void
 
-    // 1) SwiftUI bunu bir kez çağırır ve Coordinator'ı saklar
     func makeCoordinator() -> Coordinator {
         Coordinator(onCameraIdle: onCameraIdle)
     }
 
-    // 2) Harita bir kez oluşturulur
     func makeUIView(context: Context) -> GMSMapView {
         let options = GMSMapViewOptions()
         options.camera = GMSCameraPosition(
@@ -21,25 +20,55 @@ struct MapView: UIViewRepresentable {
         )
         let mapView = GMSMapView(options: options)
         mapView.paddingAdjustmentBehavior = .never
-        mapView.delegate = context.coordinator   // "Bir şey olursa Coordinator'a haber ver"
+        mapView.delegate = context.coordinator
         return mapView
     }
 
+    // SwiftUI'daki durum değişince haritayı ona uydurur
     func updateUIView(_ uiView: GMSMapView, context: Context) {
         context.coordinator.onCameraIdle = onCameraIdle
+        context.coordinator.updateMarkers(on: uiView, start: startPoint, end: endPoint)
     }
 
-    // 3) Haritanın haber verdiği "temsilci"
     class Coordinator: NSObject, GMSMapViewDelegate {
         var onCameraIdle: (CLLocationCoordinate2D) -> Void
+
+        // Marker'ları asistan saklar ki her seferinde yenisini yaratmayalım
+        private var startMarker: GMSMarker?
+        private var endMarker: GMSMarker?
 
         init(onCameraIdle: @escaping (CLLocationCoordinate2D) -> Void) {
             self.onCameraIdle = onCameraIdle
         }
 
-        // Google, harita durunca bu metodu kendisi çağırır
         func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-            onCameraIdle(position.target)   // merkezi ContentView'a ilet
+            onCameraIdle(position.target)
+        }
+
+        func updateMarkers(on mapView: GMSMapView,
+                           start: CLLocationCoordinate2D?,
+                           end: CLLocationCoordinate2D?) {
+            startMarker = updateMarker(startMarker, at: start, color: .systemGreen, title: "Başlangıç", on: mapView)
+            endMarker = updateMarker(endMarker, at: end, color: .systemRed, title: "Bitiş", on: mapView)
+        }
+
+        private func updateMarker(_ marker: GMSMarker?,
+                                  at coordinate: CLLocationCoordinate2D?,
+                                  color: UIColor,
+                                  title: String,
+                                  on mapView: GMSMapView) -> GMSMarker? {
+            // Koordinat yoksa marker'ı haritadan kaldır
+            guard let coordinate else {
+                marker?.map = nil
+                return nil
+            }
+            // Varsa eskisini kullan, yoksa yeni oluştur
+            let marker = marker ?? GMSMarker()
+            marker.position = coordinate
+            marker.title = title
+            marker.icon = GMSMarker.markerImage(with: color)
+            marker.map = mapView
+            return marker
         }
     }
 }
