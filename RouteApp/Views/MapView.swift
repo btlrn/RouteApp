@@ -5,6 +5,7 @@ struct MapView: UIViewRepresentable {
 
     var startPoint: CLLocationCoordinate2D?
     var endPoint: CLLocationCoordinate2D?
+    var encodedPolyline: String?
     var onCameraIdle: (CLLocationCoordinate2D) -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -28,6 +29,7 @@ struct MapView: UIViewRepresentable {
     func updateUIView(_ uiView: GMSMapView, context: Context) {
         context.coordinator.onCameraIdle = onCameraIdle
         context.coordinator.updateMarkers(on: uiView, start: startPoint, end: endPoint)
+        context.coordinator.updateRoute(on: uiView, encodedPath: encodedPolyline)
     }
 
     class Coordinator: NSObject, GMSMapViewDelegate {
@@ -36,6 +38,10 @@ struct MapView: UIViewRepresentable {
         // Marker'ları asistan saklar ki her seferinde yenisini yaratmayalım
         private var startMarker: GMSMarker?
         private var endMarker: GMSMarker?
+
+        // Çizili rota ve hangi rotayı çizdiğimiz
+        private var routeLine: GMSPolyline?
+        private var drawnPath: String?
 
         init(onCameraIdle: @escaping (CLLocationCoordinate2D) -> Void) {
             self.onCameraIdle = onCameraIdle
@@ -50,6 +56,31 @@ struct MapView: UIViewRepresentable {
                            end: CLLocationCoordinate2D?) {
             startMarker = updateMarker(startMarker, at: start, color: .systemGreen, title: "Başlangıç", on: mapView)
             endMarker = updateMarker(endMarker, at: end, color: .systemRed, title: "Bitiş", on: mapView)
+        }
+
+        func updateRoute(on mapView: GMSMapView, encodedPath: String?) {
+            // Rota değişmediyse hiçbir şey yapma (sonsuz döngü koruması)
+            guard encodedPath != drawnPath else { return }
+            drawnPath = encodedPath
+
+            // Eski çizgiyi kaldır
+            routeLine?.map = nil
+            routeLine = nil
+
+            // Yeni rota yoksa (sıfırlandıysa) burada dur
+            guard let encodedPath,
+                  let path = GMSPath(fromEncodedPath: encodedPath) else { return }
+
+            // Çizgiyi çiz
+            let line = GMSPolyline(path: path)
+            line.strokeWidth = 5
+            line.strokeColor = .systemBlue
+            line.map = mapView
+            routeLine = line
+
+            // Kamerayı rotaya sığdır
+            let bounds = GMSCoordinateBounds(path: path)
+            mapView.animate(with: GMSCameraUpdate.fit(bounds, withPadding: 60))
         }
 
         private func updateMarker(_ marker: GMSMarker?,

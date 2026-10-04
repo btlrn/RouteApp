@@ -7,7 +7,8 @@ struct ContentView: View {
     var body: some View {
         MapView(
             startPoint: viewModel.startPoint,
-            endPoint: viewModel.endPoint
+            endPoint: viewModel.endPoint,
+            encodedPolyline: viewModel.encodedPolyline
         ) { coordinate in
             viewModel.center = coordinate
         }
