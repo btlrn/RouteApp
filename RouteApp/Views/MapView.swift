@@ -43,6 +43,10 @@ struct MapView: UIViewRepresentable {
         private var routeLine: GMSPolyline?
         private var drawnPath: String?
 
+        // Araba ve animasyon numarası (eski animasyonları durdurmak için)
+        private var carMarker: GMSMarker?
+        private var animationID = 0
+
         init(onCameraIdle: @escaping (CLLocationCoordinate2D) -> Void) {
             self.onCameraIdle = onCameraIdle
         }
@@ -63,9 +67,10 @@ struct MapView: UIViewRepresentable {
             guard encodedPath != drawnPath else { return }
             drawnPath = encodedPath
 
-            // Eski çizgiyi kaldır
+            // Eski çizgiyi ve arabayı kaldır
             routeLine?.map = nil
             routeLine = nil
+            stopCar()
 
             // Yeni rota yoksa (sıfırlandıysa) burada dur
             guard let encodedPath,
@@ -81,7 +86,72 @@ struct MapView: UIViewRepresentable {
             // Kamerayı rotaya sığdır
             let bounds = GMSCoordinateBounds(path: path)
             mapView.animate(with: GMSCameraUpdate.fit(bounds, withPadding: 60))
+
+            // Arabayı yola çıkar
+            startCar(along: path, on: mapView)
         }
+
+        // MARK: - Araba animasyonu
+
+        private func startCar(along path: GMSPath, on mapView: GMSMapView) {
+            // En az iki nokta yoksa gidilecek yol yok
+            guard path.count() > 1 else { return }
+
+            let first = path.coordinate(at: 0)
+            let second = path.coordinate(at: 1)
+
+            let marker = GMSMarker(position: first)
+            marker.icon = carIcon()
+            marker.groundAnchor = CGPoint(x: 0.5, y: 0.5) // ikonun ortası koordinata otursun
+            marker.isFlat = true                          // harita döndükçe ikon da onunla dönsün
+            marker.zIndex = 10                            // diğer marker'ların üstünde dursun
+            marker.rotation = GMSGeometryHeading(first, second)
+            marker.map = mapView
+            carMarker = marker
+
+            // Yeni animasyon başlıyor: numarayı artır
+            animationID += 1
+            moveCar(along: path, toIndex: 1, id: animationID)
+        }
+
+        private func moveCar(along path: GMSPath, toIndex index: UInt, id: Int) {
+            // Bu animasyon iptal edildiyse, araba yoksa ya da yol bittiyse dur
+            guard id == animationID,
+                  let marker = carMarker,
+                  index < path.count() else { return }
+
+            let from = marker.position
+            let to = path.coordinate(at: index)
+
+            // Mesafeye göre süre: kısa parça hızlı, uzun parça daha yavaş geçilir
+            let distance = GMSGeometryDistance(from, to)        // metre
+            let duration = min(max(distance / 300, 0.05), 1.0)  // saniye
+
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(duration)
+            CATransaction.setCompletionBlock { [weak self] in
+                // Bu parça bitti, sıradaki noktaya geç
+                self?.moveCar(along: path, toIndex: index + 1, id: id)
+            }
+            marker.rotation = GMSGeometryHeading(from, to)
+            marker.position = to
+            CATransaction.commit()
+        }
+
+        private func stopCar() {
+            // Numarayı artırınca çalışan eski zincir kendi kendine durur
+            animationID += 1
+            carMarker?.map = nil
+            carMarker = nil
+        }
+
+        private func carIcon() -> UIImage? {
+            let config = UIImage.SymbolConfiguration(pointSize: 28, weight: .bold)
+            return UIImage(systemName: "location.north.fill", withConfiguration: config)?
+                .withTintColor(.systemOrange, renderingMode: .alwaysOriginal)
+        }
+
+        // MARK: - Marker yardımcısı
 
         private func updateMarker(_ marker: GMSMarker?,
                                   at coordinate: CLLocationCoordinate2D?,

@@ -17,6 +17,13 @@ struct ContentView: View {
                 PinView()
             }
         }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView("Rota hesaplanıyor...")
+                    .padding()
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+            }
+        }
         .ignoresSafeArea()
         .overlay(alignment: .bottom) {
             Button {
@@ -29,7 +36,23 @@ struct ContentView: View {
                     .padding(.vertical, 14)
                     .background(.blue, in: Capsule())
             }
+            .disabled(viewModel.isLoading)
             .padding(.bottom, 40)
         }
+        .alert("Bir sorun oluştu", isPresented: errorBinding) {
+            Button("Tamam", role: .cancel) { }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+    }
+
+    // Alert "açık mı?" diye bir Bool ister; biz bunu errorMessage'dan türetiyoruz
+    private var errorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { isPresented in
+                if !isPresented { viewModel.dismissError() }
+            }
+        )
     }
 }

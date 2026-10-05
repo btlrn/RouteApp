@@ -32,6 +32,9 @@ final class MapViewModel {
     // Devam eden rota isteği (iptal edebilmek için saklıyoruz)
     private var routeTask: Task<Void, Never>?
 
+    // Başlangıç ve bitiş bundan yakınsa "aynı nokta" sayılır (metre)
+    private let minimumDistance: CLLocationDistance = 20
+
     init(routeService: RouteServiceProtocol = RouteService()) {
         self.routeService = routeService
     }
@@ -53,7 +56,12 @@ final class MapViewModel {
             startPoint = center
             state = .selectingEnd
         case .selectingEnd:
-            guard let center else { return }
+            guard let center, let startPoint else { return }
+            // Uç durum 1: bitiş, başlangıçla aynı yerdeyse istek atma
+            guard distance(from: startPoint, to: center) >= minimumDistance else {
+                errorMessage = "Başlangıç ve bitiş noktası aynı olamaz. Haritayı kaydırıp başka bir nokta seç."
+                return
+            }
             endPoint = center
             state = .ready
             loadRoute()
@@ -73,6 +81,18 @@ final class MapViewModel {
         state = .selectingStart
     }
 
+    // Kullanıcı hata uyarısını kapatınca çağrılır
+    func dismissError() {
+        errorMessage = nil
+    }
+
+    // İki koordinat arasındaki mesafe (metre)
+    private func distance(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> CLLocationDistance {
+        let locationA = CLLocation(latitude: a.latitude, longitude: a.longitude)
+        let locationB = CLLocation(latitude: b.latitude, longitude: b.longitude)
+        return locationA.distance(from: locationB)
+    }
+
     // Uzmana rotayı sorar
     private func loadRoute() {
         guard let startPoint, let endPoint else { return }
@@ -86,7 +106,13 @@ final class MapViewModel {
                 let polyline = try await routeService.fetchRoute(from: startPoint, to: endPoint)
                 guard !Task.isCancelled else { return }
                 encodedPolyline = polyline
+            } catch let error as RouteError {
+                // Uç durum 2: bizim hatalarımız (rota yok, cevap bozuk...) → anlaşılır mesaj
+                guard !Task.isCancelled else { return }
+                errorMessage = "Bu iki nokta arasında rota bulunamadı. Başka bir nokta dene."
+                print("Rota hatası:", error)
             } catch {
+                // Sistem hataları (internet yok gibi) → Apple'ın hazır mesajı
                 guard !Task.isCancelled else { return }
                 errorMessage = error.localizedDescription
                 print("Rota hatası:", error)
