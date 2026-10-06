@@ -6,6 +6,7 @@ struct MapView: UIViewRepresentable {
     var startPoint: CLLocationCoordinate2D?
     var endPoint: CLLocationCoordinate2D?
     var encodedPolyline: String?
+    var userLocation: CLLocationCoordinate2D?
     var onCameraIdle: (CLLocationCoordinate2D) -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -22,12 +23,14 @@ struct MapView: UIViewRepresentable {
         let mapView = GMSMapView(options: options)
         mapView.paddingAdjustmentBehavior = .never
         mapView.delegate = context.coordinator
+        mapView.isMyLocationEnabled = true   // kullanıcının mavi noktası
         return mapView
     }
 
     // SwiftUI'daki durum değişince haritayı ona uydurur
     func updateUIView(_ uiView: GMSMapView, context: Context) {
         context.coordinator.onCameraIdle = onCameraIdle
+        context.coordinator.centerOnUser(on: uiView, location: userLocation)
         context.coordinator.updateMarkers(on: uiView, start: startPoint, end: endPoint)
         context.coordinator.updateRoute(on: uiView, encodedPath: encodedPolyline)
     }
@@ -47,6 +50,9 @@ struct MapView: UIViewRepresentable {
         private var carMarker: GMSMarker?
         private var animationID = 0
 
+        // Kullanıcıya bir kere odaklandık mı? (her güncellemede kamerayı zıplatmamak için)
+        private var hasCenteredOnUser = false
+
         init(onCameraIdle: @escaping (CLLocationCoordinate2D) -> Void) {
             self.onCameraIdle = onCameraIdle
         }
@@ -55,12 +61,25 @@ struct MapView: UIViewRepresentable {
             onCameraIdle(position.target)
         }
 
+        // MARK: - Kullanıcı konumu
+
+        func centerOnUser(on mapView: GMSMapView, location: CLLocationCoordinate2D?) {
+            // Konum yoksa, zaten odaklandıysak ya da rota çiziliyse kameraya dokunma
+            guard let location, !hasCenteredOnUser, drawnPath == nil else { return }
+            hasCenteredOnUser = true
+            mapView.animate(to: GMSCameraPosition(target: location, zoom: 14))
+        }
+
+        // MARK: - Marker'lar
+
         func updateMarkers(on mapView: GMSMapView,
                            start: CLLocationCoordinate2D?,
                            end: CLLocationCoordinate2D?) {
             startMarker = updateMarker(startMarker, at: start, color: .systemGreen, title: "Başlangıç", on: mapView)
             endMarker = updateMarker(endMarker, at: end, color: .systemRed, title: "Bitiş", on: mapView)
         }
+
+        // MARK: - Rota
 
         func updateRoute(on mapView: GMSMapView, encodedPath: String?) {
             // Rota değişmediyse hiçbir şey yapma (sonsuz döngü koruması)

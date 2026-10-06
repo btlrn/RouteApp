@@ -35,10 +35,9 @@ final class MapViewModel {
     // Başlangıç ve bitiş bundan yakınsa "aynı nokta" sayılır (metre)
     private let minimumDistance: CLLocationDistance = 20
 
-    init(routeService: RouteServiceProtocol = RouteService()) {
-        self.routeService = routeService
+    init(routeService: RouteServiceProtocol? = nil) {
+        self.routeService = routeService ?? RouteService()
     }
-
     // Butonda ne yazacağına ışığa bakarak karar verir
     var buttonTitle: String {
         switch state {
