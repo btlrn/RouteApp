@@ -34,7 +34,7 @@ struct ContentView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 14)
-                    .background(.blue, in: Capsule())
+                    .background(Color.brand, in: Capsule())
             }
             .disabled(viewModel.isLoading)
             .padding(.bottom, 40)

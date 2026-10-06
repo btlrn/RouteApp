@@ -23,6 +23,7 @@ struct OnboardingView: View {
             HStack {
                 Spacer()
                 Button("Atla") { onFinish() }
+                    .foregroundColor(.secondary)
                     .padding()
             }
 
@@ -47,7 +48,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(.blue, in: Capsule())
+                    .background(Color.brand, in: Capsule())
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
@@ -58,7 +59,7 @@ struct OnboardingView: View {
         VStack(spacing: 24) {
             Image(systemName: page.icon)
                 .font(.system(size: 80))
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.brand)
 
             Text(page.title)
                 .font(.title.bold())

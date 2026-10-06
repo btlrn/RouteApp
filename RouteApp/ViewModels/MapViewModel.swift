@@ -2,6 +2,7 @@ import Foundation
 import CoreLocation
 import Observation
 
+// Ekranda neler olacak,neler gösterilecek?
 // Trafik ışığı: aynı anda sadece biri olabilir
 enum SelectionState {
     case selectingStart

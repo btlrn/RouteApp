@@ -98,7 +98,7 @@ struct MapView: UIViewRepresentable {
             // Çizgiyi çiz
             let line = GMSPolyline(path: path)
             line.strokeWidth = 5
-            line.strokeColor = .systemBlue
+            line.strokeColor = UIColor(Color.brand)
             line.map = mapView
             routeLine = line
 
